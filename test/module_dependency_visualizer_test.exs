@@ -37,6 +37,26 @@ defmodule ModuleDependencyVisualizerTest do
                ])
     end
 
+    @tag :skip
+    test "analyzing a file with a module attribute produces the right dependencies" do
+      file = """
+      defmodule Tester.One do
+        @other Tester.Other
+
+        def third(input) do
+          @other.YetAnother.first(input)
+        end
+      end
+      """
+
+      result = file |> MDV.analyze() |> Enum.sort()
+
+      assert result ==
+               Enum.sort([
+                 {"Tester.One", "Tester.Other.YetAnother"}
+               ])
+    end
+
     test "analyzing a file with aliases produces the right dependencies" do
       file = """
       defmodule Tester.One do
