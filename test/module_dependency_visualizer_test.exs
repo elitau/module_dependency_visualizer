@@ -165,21 +165,27 @@ defmodule ModuleDependencyVisualizerTest do
   end
 
   describe "filter/2" do
-    test "removes all modules not matching the given list of include: names" do
+    test "removes all modules not matching the given list of include: names only looking at from node" do
       file = """
-      defmodule AnotherApplicationService do
+      defmodule Include.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+
+      defmodule Remove.Me do
         def third(input) do
           AnotherModule.first(input)
         end
       end
       """
 
-      result = file |> MDV.analyze() |> MDV.filter(include: ["ApplicationService"])
+      result = file |> MDV.analyze() |> MDV.filter(include: ["Include.Me"])
 
-      assert result == [{"AnotherApplicationService", "AnotherModule"}]
+      assert result == [{"Include.Me", "AnotherModule"}]
     end
 
-    test "excludes all modules matching the given list of exclude: names" do
+    test "excludes all modules matching the given list of exclude: names only looking at to node" do
       file = """
       defmodule Top.Module do
         def third(input) do
@@ -192,6 +198,26 @@ defmodule ModuleDependencyVisualizerTest do
       result = file |> MDV.analyze() |> MDV.filter(exclude: ["UsedModule"])
 
       assert result == [{"Top.Module", "AnotherModule"}]
+    end
+
+    test "no filters" do
+      file = """
+      defmodule First.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+
+      defmodule Second.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+      """
+
+      result = file |> MDV.analyze() |> MDV.filter() |> Enum.sort()
+
+      assert result == Enum.sort([{"First.Me", "AnotherModule"}, {"Second.Me", "AnotherModule"}])
     end
   end
 

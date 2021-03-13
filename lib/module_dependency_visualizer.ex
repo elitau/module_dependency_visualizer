@@ -9,10 +9,11 @@ defmodule ModuleDependencyVisualizer do
   Analyzes a given list of file paths (absolute or relative), creates the
   necessary Graphviz file, and then creates the graph and opens it.
   """
-  @spec run(list) :: :ok
-  def run(file_paths) do
+  @spec run(list, list) :: :ok
+  def run(file_paths, options) do
     file_paths
     |> analyze
+    |> filter(options)
     |> create_gv_file
     |> create_and_open_graph
 
@@ -61,17 +62,16 @@ defmodule ModuleDependencyVisualizer do
   removes all modules not matching the given list of include: names
   """
   @spec filter([{String.t(), String.t()}], include: String.t()) :: [{String.t(), String.t()}]
-  def filter(deps_graph, opts) when is_list(opts) do
+  def filter(deps_graph, opts \\ []) when is_list(opts) do
     include_from = Keyword.get(opts, :include, [])
     exclude_to = Keyword.get(opts, :exclude, [])
 
     deps_graph
     |> Enum.filter(fn {from, _to} -> contains_include_from(include_from, from) end)
-
-    deps_graph
     |> Enum.filter(fn {_from, to} -> !contains_exclude_to?(exclude_to, to) end)
   end
 
+  defp contains_include_from([], _from), do: true
   defp contains_include_from(include_to, from) do
     Enum.any?(include_to, fn list_elem when is_binary(list_elem) ->
       String.contains?(from, list_elem)

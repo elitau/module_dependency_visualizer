@@ -1,1 +1,42 @@
-ModuleDependencyVisualizer.run(Path.wildcard(System.argv()))
+include = ~w(ApplicationService)
+
+exclude = [
+  "Map",
+  "List",
+  "Stream",
+  "Path",
+  "Poison",
+  "Logger",
+  "Timex",
+  "File",
+  "Enum",
+  "crypto",
+  "String",
+  "Base",
+  "Integer",
+  "DateTime",
+  "os",
+  "Number",
+  "Elixir.Kernel",
+  "Regex",
+  "URI",
+  "Application",
+  "Date",
+  "Tesla",
+  "Jason",
+  "Supervisor",
+  "Atom",
+  "Process",
+  "Plug",
+  "Plug.Conn",
+  "IO",
+  "init",
+  "rand",
+  "IO",
+  "erlang",
+  "Float",
+  "Kernel",
+  "Plug.Upload"
+]
+
+ModuleDependencyVisualizer.run(Path.wildcard(System.argv()), include: include, exclude: exclude)
