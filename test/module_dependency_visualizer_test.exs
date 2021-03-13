@@ -164,6 +164,37 @@ defmodule ModuleDependencyVisualizerTest do
     end
   end
 
+  describe "filter/2" do
+    test "removes all modules not matching the given list of include: names" do
+      file = """
+      defmodule AnotherApplicationService do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+      """
+
+      result = file |> MDV.analyze() |> MDV.filter(include: ["ApplicationService"])
+
+      assert result == [{"AnotherApplicationService", "AnotherModule"}]
+    end
+
+    test "excludes all modules matching the given list of exclude: names" do
+      file = """
+      defmodule Top.Module do
+        def third(input) do
+          UsedModule.first(input)
+          AnotherModule.first(input)
+        end
+      end
+      """
+
+      result = file |> MDV.analyze() |> MDV.filter(exclude: ["UsedModule"])
+
+      assert result == [{"Top.Module", "AnotherModule"}]
+    end
+  end
+
   describe "create_gv_file/1" do
     test "turns a dependency list into a properly formatted graphviz file" do
       dependency_list = [

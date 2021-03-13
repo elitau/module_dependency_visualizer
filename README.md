@@ -38,8 +38,8 @@ No, it most certainly is not. Tests are sparse, documentation is lacking, and
 the code itself has a ton of duplication. It is, however, a working application
 without any dependencies.
 
-## Will it be developed further?
+## Allow to filter
 
-No, it will not. If you're interested in developing this, feel free to fork this
-and take it in whichever direction you see fit! This fits my needs for now, and
-at the moment I'm too busy to commit to maintaining it.
+The `include` filter keeps only the __origin__ nodes that contains one the given
+names. Afterwards the `exclude` filter removes all outgoing dependencies that
+contains one the given names.

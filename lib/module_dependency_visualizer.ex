@@ -37,11 +37,10 @@ defmodule ModuleDependencyVisualizer do
     end)
   end
 
-  @doc """
-  Analyzes a single file for dependencies between modules. This is the real meat
-  of this tool. After this is done, then it's just formatting the graphviz file
-  correctly and that's pretty easy.
-  """
+  # Analyzes a single file for dependencies between modules. This is the real meat
+  # of this tool. After this is done, then it's just formatting the graphviz file
+  # correctly and that's pretty easy.
+
   @spec analyze(String.t()) :: [{String.t(), String.t()}]
   def analyze(file) when is_binary(file) do
     {:ok, ast} = Code.string_to_quoted(file)
@@ -56,6 +55,33 @@ defmodule ModuleDependencyVisualizer do
       end)
 
     List.flatten(all_modules)
+  end
+
+  @doc """
+  removes all modules not matching the given list of include: names
+  """
+  @spec filter([{String.t(), String.t()}], include: String.t()) :: [{String.t(), String.t()}]
+  def filter(deps_graph, opts) when is_list(opts) do
+    include_from = Keyword.get(opts, :include, [])
+    exclude_to = Keyword.get(opts, :exclude, [])
+
+    deps_graph
+    |> Enum.filter(fn {from, _to} -> contains_include_from(include_from, from) end)
+
+    deps_graph
+    |> Enum.filter(fn {_from, to} -> !contains_exclude_to?(exclude_to, to) end)
+  end
+
+  defp contains_include_from(include_to, from) do
+    Enum.any?(include_to, fn list_elem when is_binary(list_elem) ->
+      String.contains?(from, list_elem)
+    end)
+  end
+
+  defp contains_exclude_to?(list, value) when is_binary(value) and is_list(list) do
+    Enum.any?(list, fn list_elem when is_binary(list_elem) ->
+      String.contains?(list_elem, value)
+    end)
   end
 
   defp deps_for_module(ast) do
