@@ -6,7 +6,7 @@ defmodule ModuleDependencyVisualizer.MixProject do
       app: :module_dependency_visualizer,
       version: "0.1.0",
       elixir: "~> 1.6-dev",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
   end
@@ -20,6 +20,6 @@ defmodule ModuleDependencyVisualizer.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    []
+    [{:tix, "~> 0.4", only: :test, runtime: false}]
   end
 end

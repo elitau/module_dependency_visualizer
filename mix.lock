@@ -1,0 +1,6 @@
+%{
+  "fs": {:hex, :fs, "6.12.0", "c274afcb5e74c4bcc4ed8f608d6df7d01786638acb768bd847e8f6bd2b123fae", [:rebar3], [{:mix_rebar3, "~> 0.1", [hex: :mix_rebar3, repo: "hexpm", optional: false]}], "hexpm", "4ab6aad63164e4d03b3d3bbc9ff20745568887c5f7b9377074298e6215ccb281"},
+  "mix_rebar3": {:hex, :mix_rebar3, "0.1.0", "0af61db06f7c596e346f8e7181521c02df29cafdb03ef50a74bf9fc4c6bf4fc2", [:mix], [], "hexpm", "320c4d8a7b3cc2fea07b63af61670fbf211ff81a449372cb6518d8571598eb5b"},
+  "test_iex": {:hex, :test_iex, "0.1.0", "37a0c0ac9c7a9d3d29195923722f3f8690513fe9c78d24b62f78e4960c5cc3f1", [:mix], [], "hexpm", "84c3e469170b1a5c7d79d1a1cadfba0bbb39aa3f7f851ef6a3d592c139aa56ba"},
+  "tix": {:hex, :tix, "0.4.1", "ec4fc7795b024ef0233c5e79d18449162bccd4275357157d11c4fea449770fa8", [:mix], [{:fs, "~> 6.1", [hex: :fs, repo: "hexpm", optional: false]}, {:test_iex, "~> 0.1.0", [hex: :test_iex, repo: "hexpm", optional: false]}], "hexpm", "82ff25c10cf4bfb997d939b92e115c5423ed1122c56398be139fe714044e7ca3"},
+}
