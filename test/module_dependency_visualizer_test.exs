@@ -190,14 +190,18 @@ defmodule ModuleDependencyVisualizerTest do
       defmodule Top.Module do
         def third(input) do
           UsedModule.first(input)
+          PartOf.call(input)
+          PartOf.WithMore.call(input)
           AnotherModule.first(input)
         end
       end
       """
 
-      result = file |> MDV.analyze() |> MDV.filter(exclude: ["UsedModule"])
+      result =
+        file |> MDV.analyze() |> MDV.filter(exclude: ["UsedModule", ~r/PartOf\Z/]) |> Enum.sort()
 
-      assert result == [{"Top.Module", "AnotherModule"}]
+      assert result ==
+               Enum.sort([{"Top.Module", "PartOf.WithMore"}, {"Top.Module", "AnotherModule"}])
     end
 
     test "no filters" do
@@ -218,6 +222,43 @@ defmodule ModuleDependencyVisualizerTest do
       result = file |> MDV.analyze() |> MDV.filter() |> Enum.sort()
 
       assert result == Enum.sort([{"First.Me", "AnotherModule"}, {"Second.Me", "AnotherModule"}])
+    end
+  end
+
+  describe "reverse edge direction" do
+    test "for matching from and to nodes" do
+      file = ~s|
+      defmodule First.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+
+      defmodule Second.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+
+      defmodule Third.Me do
+        def third(input) do
+          AnotherModule.first(input)
+        end
+      end
+      |
+
+      result =
+        file
+        |> MDV.analyze()
+        |> MDV.reverse_edges(edges_to_reverse: [{"First.Me", "AnotherModule"},  {~r/Third/, "AnotherModule"}])
+        |> Enum.sort()
+
+      assert result ==
+               Enum.sort([
+                 {"AnotherModule", "First.Me"},
+                 {"Second.Me", "AnotherModule"},
+                 {"AnotherModule", "Third.Me"}
+               ])
     end
   end
 

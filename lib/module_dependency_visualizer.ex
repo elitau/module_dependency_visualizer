@@ -14,8 +14,8 @@ defmodule ModuleDependencyVisualizer do
     file_paths
     |> analyze
     |> filter(options)
+    |> reverse_edges(options)
     |> create_gv_file
-    |> IO.inspect()
     |> create_and_open_graph
 
     :ok
@@ -72,6 +72,33 @@ defmodule ModuleDependencyVisualizer do
     |> Enum.reject(fn {_from, to} -> exclude_to_contains?(exclude_to, to) end)
   end
 
+  @doc """
+  reverse the direction on edges
+  """
+  @spec reverse_edges([{String.t(), String.t()}], [{String.t(), String.t()}]) :: [
+          {String.t(), String.t()}
+        ]
+  def reverse_edges(deps_graph, opts) do
+    edges_to_reverse = Keyword.get(opts, :edges_to_reverse, [])
+
+    deps_graph
+    |> Enum.map(fn {from, to} = deps_edge ->
+      case edge_matches?(edges_to_reverse, deps_edge) do
+        true ->
+          {to, from}
+
+        false ->
+          deps_edge
+      end
+    end)
+  end
+
+  defp edge_matches?(edges_to_reverse, {dep_from, dep_to}) when is_list(edges_to_reverse) do
+    Enum.any?(edges_to_reverse, fn {remove_from, remove_to} ->
+      matches?(dep_from, remove_from) && matches?(dep_to, remove_to)
+    end)
+  end
+
   defp contains_include_from([], _from), do: true
 
   defp contains_include_from(include_to, from) do
@@ -81,9 +108,17 @@ defmodule ModuleDependencyVisualizer do
   end
 
   defp exclude_to_contains?(list, value) when is_binary(value) and is_list(list) do
-    Enum.any?(list, fn list_elem when is_binary(list_elem) ->
-      String.contains?(list_elem, value)
+    Enum.any?(list, fn list_elem ->
+      matches?(value, list_elem)
     end)
+  end
+
+  defp matches?(value, pattern) when is_binary(pattern) do
+    String.contains?(value, pattern)
+  end
+
+  defp matches?(value, pattern) do
+    Regex.match?(pattern, value)
   end
 
   defp deps_for_module(ast) do
