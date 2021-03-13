@@ -15,6 +15,7 @@ defmodule ModuleDependencyVisualizer do
     |> analyze
     |> filter(options)
     |> create_gv_file
+    |> IO.inspect()
     |> create_and_open_graph
 
     :ok
@@ -68,17 +69,18 @@ defmodule ModuleDependencyVisualizer do
 
     deps_graph
     |> Enum.filter(fn {from, _to} -> contains_include_from(include_from, from) end)
-    |> Enum.filter(fn {_from, to} -> !contains_exclude_to?(exclude_to, to) end)
+    |> Enum.reject(fn {_from, to} -> exclude_to_contains?(exclude_to, to) end)
   end
 
   defp contains_include_from([], _from), do: true
+
   defp contains_include_from(include_to, from) do
     Enum.any?(include_to, fn list_elem when is_binary(list_elem) ->
       String.contains?(from, list_elem)
     end)
   end
 
-  defp contains_exclude_to?(list, value) when is_binary(value) and is_list(list) do
+  defp exclude_to_contains?(list, value) when is_binary(value) and is_list(list) do
     Enum.any?(list, fn list_elem when is_binary(list_elem) ->
       String.contains?(list_elem, value)
     end)

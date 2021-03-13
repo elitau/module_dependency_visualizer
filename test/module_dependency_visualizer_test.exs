@@ -165,7 +165,7 @@ defmodule ModuleDependencyVisualizerTest do
   end
 
   describe "filter/2" do
-    test "removes all modules not matching the given list of include: names only looking at from node" do
+    test "removes all modules not matching the given list of include: names only by looking at from node" do
       file = """
       defmodule Include.Me do
         def third(input) do
@@ -185,7 +185,7 @@ defmodule ModuleDependencyVisualizerTest do
       assert result == [{"Include.Me", "AnotherModule"}]
     end
 
-    test "excludes all modules matching the given list of exclude: names only looking at to node" do
+    test "excludes all modules matching the given list of exclude: names only by looking at to node" do
       file = """
       defmodule Top.Module do
         def third(input) do
