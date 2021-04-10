@@ -250,7 +250,9 @@ defmodule ModuleDependencyVisualizerTest do
       result =
         file
         |> MDV.analyze()
-        |> MDV.reverse_edges(edges_to_reverse: [{"First.Me", "AnotherModule"},  {~r/Third/, "AnotherModule"}])
+        |> MDV.reverse_edges(
+          edges_to_reverse: [{"First.Me", "AnotherModule"}, {~r/Third/, "AnotherModule"}]
+        )
         |> Enum.sort()
 
       assert result ==
