@@ -204,6 +204,36 @@ defmodule ModuleDependencyVisualizerTest do
                Enum.sort([{"Top.Module", "PartOf.WithMore"}, {"Top.Module", "AnotherModule"}])
     end
 
+    test "remove unconnected nodes aka. there can be only one graph" do
+      file = """
+      defmodule One do
+        def call(input) do
+          Two.first(input)
+        end
+      end
+
+      defmodule Three do
+        def call(input) do
+          Two.first(input)
+        end
+      end
+
+      defmodule Four do
+        def call(input) do
+          Five.first(input)
+        end
+      end
+      """
+
+      result =
+        file
+        |> MDV.analyze()
+        |> MDV.filter(remove_all_graphs_not_connected_to: "One")
+        |> Enum.sort()
+
+      assert result == Enum.sort([{"One", "Two"}, {"Three", "Two"}])
+    end
+
     test "no filters" do
       file = """
       defmodule First.Me do

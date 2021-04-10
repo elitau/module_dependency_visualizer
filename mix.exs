@@ -20,6 +20,9 @@ defmodule ModuleDependencyVisualizer.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [{:tix, "~> 0.4", only: :test, runtime: false}]
+    [
+      {:tix, "~> 0.4", only: :test, runtime: false},
+      {:libgraph, "~> 0.7"}
+    ]
   end
 end

@@ -67,9 +67,13 @@ defmodule ModuleDependencyVisualizer do
     include_from = Keyword.get(opts, :include, [])
     exclude_to = Keyword.get(opts, :exclude, [])
 
+    remove_all_graphs_not_connected_to =
+      Keyword.get(opts, :remove_all_graphs_not_connected_to, :keep_all_graphs)
+
     deps_graph
     |> Enum.filter(fn {from, _to} -> contains_include_from(include_from, from) end)
     |> Enum.reject(fn {_from, to} -> exclude_to_contains?(exclude_to, to) end)
+    |> RemoveUnconnectedGraphs.remove_unconnected_graphs(remove_all_graphs_not_connected_to)
   end
 
   @doc """
