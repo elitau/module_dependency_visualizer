@@ -21,6 +21,10 @@ Limit graph to nodes connected to current file, Maybe with a [watcher task](http
 
 [1] [VS Code interactive graphviz extension](https://github.com/tintinweb/vscode-interactive-graphviz)
 
+## Complete App Graph
+
+Show the whole application in one picture.
+
 ## What is this?
 
 I needed a way to generate a graph of module dependencies for Elixir
