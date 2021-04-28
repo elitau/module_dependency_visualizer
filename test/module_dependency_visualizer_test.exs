@@ -294,6 +294,22 @@ defmodule ModuleDependencyVisualizerTest do
     end
   end
 
+  describe "add node color" do
+    test "assign colors to nodes" do
+      graph = [
+        {"AnotherModule", "First.Me"},
+        {"Second.Me", "AnotherModule"},
+        {"AnotherModule", "Third.They"}
+      ]
+
+      assert MDV.add_colors(graph, [{~r|Me|, "red"}, {~r|Third|, "green"}]) == [
+               {"First.Me", [fillcolor: "red", style: "filled"]},
+               {"Second.Me", [fillcolor: "red", style: "filled"]},
+               {"Third.They", [fillcolor: "green", style: "filled"]}
+             ]
+    end
+  end
+
   describe "create_gv_file/1" do
     test "turns a dependency list into a properly formatted graphviz file" do
       dependency_list = [
@@ -311,10 +327,41 @@ defmodule ModuleDependencyVisualizerTest do
         "Tester.One" -> "Tester.MyOther";
         "Tester.One" -> "My.Long.Module.Chain";
         "Tester.Two" -> "Tester.One";
+
       }
       """
 
-      assert MDV.create_gv_file(dependency_list) == expected
+      assert MDV.create_gv_file(dependency_list, []) == expected
+    end
+
+    # Example of the format
+    # digraph D {
+    #   B [shape=box]
+    #   C [shape=circle]
+
+    #   A -> B [style=dashed, color=grey]
+    #   A -> C [color="black:invis:black"]
+    #   A -> D [penwidth=5, arrowhead=none]
+
+    #   A [shape=diamond, fillcolor=red, style=filled]
+    # }
+    test "colorize" do
+      dependency_list = [
+        {"Tester.One", "String"}
+      ]
+
+      nodes_with_attributes = [
+        {"Tester.One", [fillcolor: "red", style: "filled"]}
+      ]
+
+      expected = """
+      digraph G {
+        "Tester.One" -> "String";
+        "Tester.One" [fillcolor=red, style=filled];
+      }
+      """
+
+      assert MDV.create_gv_file(dependency_list, nodes_with_attributes) == expected
     end
   end
 end

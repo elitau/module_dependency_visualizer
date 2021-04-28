@@ -49,6 +49,7 @@ exclude = [
   ~r(Freigabe\.Abwesenheit\Z),
   ~r(Freigabe\.Ansprechpartner\Z),
   ~r(Freigabe\.Arbeitszeit\Z),
+  ~r(Freigabe\.ArbeitszeitAusArbeitszeitzeile\Z),
   ~r(Freigabe\.Arbeitszeitenpaket\Z),
   ~r(Freigabe\.Arbeitszeitenpaket.Arbeitsturnus\Z),
   ~r(Freigabe\.Abrechnungsperiode\Z),
@@ -78,9 +79,18 @@ exclude = [
   "Ecto.Schema"
 ]
 
+# Available colors: https://www.graphviz.org/doc/info/colors.html#x11
+colors = [
+  {~r|ApplicationService|, :lightblue},
+  {~r|EventPublisher|, :yellow},
+  {~r|EventListener|, :green},
+  {~r|Events|, :orange}
+]
+
 ModuleDependencyVisualizer.run(Path.wildcard(System.argv()),
   include: include,
   exclude: exclude,
+  colors: colors,
   keep_graph_containing: "Freigabe.ArbeitszeitenpaketFreigebenApplicationService",
   edges_to_reverse: [
     {~r(EventListener\Z), ~r(Events\.)},

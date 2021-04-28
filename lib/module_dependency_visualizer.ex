@@ -13,11 +13,16 @@ defmodule ModuleDependencyVisualizer do
   """
   @spec run(list, list) :: :ok
   def run(file_paths, options) do
-    file_paths
-    |> analyze()
-    |> filter(options)
-    |> reverse_edges(options)
-    |> create_gv_file()
+    dependency_list =
+      file_paths
+      |> analyze()
+      |> filter(options)
+      |> reverse_edges(options)
+
+    nodes_with_attributes = add_colors(dependency_list, Keyword.get(options, :colors, []))
+
+    dependency_list
+    |> create_gv_file(nodes_with_attributes)
     |> create_and_open_graph()
 
     :ok
@@ -94,12 +99,46 @@ defmodule ModuleDependencyVisualizer do
   end
 
   @doc """
+  Creates nodes associated with the given color. Used for rendering of the graph with graphviz.
+  """
+  def add_colors(dependency_list, color_definitions) do
+    dependency_list
+    |> distinct_nodes()
+    |> Enum.map(fn node ->
+      Enum.find_value(color_definitions, fn {pattern, color} ->
+        if Regex.match?(pattern, node) do
+          node_with_color(node, color)
+        end
+      end)
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp distinct_nodes(dependency_list) do
+    dependency_list
+    |> Enum.reduce(MapSet.new(), fn {from, to}, set ->
+      MapSet.put(set, from) |> MapSet.put(to)
+    end)
+    |> MapSet.to_list()
+  end
+
+  defp node_with_color(name, color) do
+    {name, [fillcolor: color, style: "filled"]}
+  end
+
+  @doc """
   Takes a list of dependencies and returns a string that is a valid `dot` file.
   """
-  @spec create_gv_file(list) :: String.t()
-  def create_gv_file(dependency_list) do
+  @spec create_gv_file(list, list) :: String.t()
+  def create_gv_file(dependency_list, nodes_with_attributes) do
+    nodes =
+      Enum.map(nodes_with_attributes, fn {node, attributes} ->
+        serialized_attributes = Enum.map(attributes, fn {name, value} -> "#{name}=#{value}" end)
+        ~s|  "#{node}" [#{Enum.join(serialized_attributes, ", ")}];|
+      end)
+
     body = Enum.map(dependency_list, fn {mod1, mod2} -> "  \"#{mod1}\" -> \"#{mod2}\";" end)
-    "digraph G {\n#{Enum.join(body, "\n")}\n}\n"
+    "digraph G {\n#{Enum.join(body, "\n")}\n#{Enum.join(nodes, "\n")}\n}\n"
   end
 
   @doc """
