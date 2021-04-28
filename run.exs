@@ -1,6 +1,8 @@
-include = ~w(ApplicationService)
+include = ~w(ApplicationService Events. EventListener EventPublisher ProcessManager)
 
 exclude = [
+  "Agent",
+  "Shared",
   "Map",
   "List",
   "Stream",
@@ -20,8 +22,9 @@ exclude = [
   "Elixir.Kernel",
   "Regex",
   "URI",
-  "Application",
+  ~r(Application\Z),
   "Date",
+  "Task",
   "Tesla",
   "Jason",
   "Supervisor",
@@ -36,7 +39,49 @@ exclude = [
   "erlang",
   "Float",
   "Kernel",
-  "Plug.Upload"
+  "Keyword",
+  "Plug.Upload",
+  "Elixir.Access",
+  "Mix",
+  "Metadata",
+  "Multi",
+  ~r(Freigabe\Z),
+  ~r(Freigabe\.Abwesenheit\Z),
+  ~r(Freigabe\.Ansprechpartner\Z),
+  ~r(Freigabe\.Arbeitszeit\Z),
+  ~r(Freigabe\.Arbeitnehmer\Z),
+  ~r(Freigabe\.Auftrag\Z),
+  ~r(Freigabe\.Import\Z),
+  ~r(Freigabe\.Disposition\Z),
+  ~r(Freigabe\.Reklamation\Z),
+  ~r(Freigabe\.Reklamation\.Kommentar\Z),
+  ~r(Freigabe\.Rechnungsturnus\Z),
+  ~r(Freigabe\.RechnungsturnusFuerAuftrag\Z),
+  ~r(Freigabe\.SollIstAbgleich\Z),
+  "StuditempsMitarbeiter",
+  "AppendableEvent",
+  "LoggableEvent",
+  "Repo",
+  "EventStore",
+  "Tackle",
+  "Exception",
+  "CommonFunctions",
+  "Behaviour",
+  "application",
+  "Module",
+  "ExUnit.Assertions",
+  "ArgumentError",
+  "Ecto.Query",
+  "Ecto.Schema"
 ]
 
-ModuleDependencyVisualizer.run(Path.wildcard(System.argv()), include: include, exclude: exclude)
+ModuleDependencyVisualizer.run(Path.wildcard(System.argv()),
+  include: include,
+  exclude: exclude,
+  keep_graph_containing: "Freigabe.ArbeitszeitenpaketFreigebenApplicationService",
+  edges_to_reverse: [
+    {~r(EventListener\Z), ~r(Events\.)},
+    {~r(ProcessManager\Z), ~r(Events\.)},
+    {~r(EventPublisher\Z), ~r(Events\.)}
+  ]
+)
