@@ -150,7 +150,23 @@ defmodule ModuleDependencyVisualizer do
     gv_file_path = "./output.gv"
     graph_path = "./graph.png"
     File.write(gv_file_path, gv_file)
-    System.cmd("dot", ["-Tpng", gv_file_path, "-o", graph_path])
+    execute_graphviz(gv_file_path, graph_path)
     System.cmd("open", [graph_path])
+  end
+
+  defp execute_graphviz(gv_file_path, graph_path) do
+    try do
+      System.cmd("dot", ["-Tpng", gv_file_path, "-o", graph_path])
+    rescue
+      e ->
+        IO.puts(
+          "============================================================\n" <>
+            "Could not generate graph.\n" <>
+            "Do you have graphviz installed? Seems like the dot executable is not available.\n" <>
+            "============================================================\n"
+        )
+
+        raise e
+    end
   end
 end
