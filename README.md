@@ -2,7 +2,7 @@
 
 ## Executing
 
-`mix run run.exs "/Users/elitau/Documents/workspace/freigabe/lib/**/*.{ex, exs}"`
+`mix run create_app_graph.exs "/Users/elitau/Documents/workspace/freigabe/lib/**/*.{ex, exs}"`
 
 ## Integration with vs code
 
